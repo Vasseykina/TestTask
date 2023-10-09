@@ -12,6 +12,15 @@ public class Character {
     private boolean alive;
     private String name;
 
+    public Character(String name, int attack, int protection, int maxHealth, int minDamage) {
+        setName(name);
+        setAttack(attack);
+        setProtection(protection);
+        setMaxHealth(maxHealth);
+        setCurHealth(maxHealth);
+        setMinDamage(minDamage);
+        this.alive = true;
+    }
 
     public boolean isAlive() {
         return alive;
@@ -25,67 +34,42 @@ public class Character {
         }
     }
 
-
-    public Character(String name, int attack, int protection, int maxHealth, int minDamage) {
-        setName(name);
-        setAttack(attack);
-        setProtection(protection);
-        setMaxHealth(maxHealth);
-        setCurHealth(maxHealth);
-        setMinDamage(minDamage);
-        this.alive = true;
-    }
-
-
     public static int rnd(int min, int max) { //рандом в диапазоне
         max -= min;
         return (int) (Math.random() * ++max) + min;
     }
 
-//    public int modifierAttack() {// количество кубиков
-//
-//        return modifier;
-//    }
-
-
     public int calculateSuccess(Character character) { //количество атак
         int modifier = this.getAttack() - character.getProtection() + 1; //количество кубиков
         if (modifier <= 0) {
-            modifier= 1;
+            modifier = 1;
         }
-        System.out.println(this.getName() + " have " + modifier + " modifier\n" );
+        System.out.println(this.getName() + " have " + modifier + " modifier");
         int countAttack = 0;
-        while (modifier > 0) {
+        System.out.println("The value of the dice:");
+        for (int i = 0; i < modifier; i++) {
             int rand = rnd(1, 6);
+            System.out.println(" dice" + i + " : " + rand);
             if (rand >= 5) {
                 countAttack += 1;
             }
-            modifier = -1;
         }
-        System.out.println(this.getName() + " have " + countAttack+ " countAttack\n" );
+        System.out.println(this.getName() + " have " + countAttack + " countAttack");
         return countAttack;
     }
 
-    //    public void attack(Character character) {
-//        if (this.alive) {
-//            int attack = this.calculateSuccess(modifierAttack(character));//количество атак
-//            if (attack == 0) {
-//                System.out.println(this.name + "can't attack to" + character.getName());
-//                return;
-//            }
-//            for (int i = attack; i > 0; attack--) {
-//                System.out.println("have" + attack + "attack");
-//                while(character.alive){
-//
-//                }
-//            }
-//
-//        }
-//    }
     public void attack(Character character) {
-        int damage = rnd(this.getMinDamage(), character.getCurHealth());
-        character.setCurHealth(character.getCurHealth() - damage);
-        System.out.println(character.getName() + "have" + character.getCurHealth() + " health after attack" + this.getName());
+        if (character.isAlive()==true) {
+            int damage = rnd(this.getMinDamage(), character.getCurHealth());
+            character.setCurHealth(character.getCurHealth() - damage);
+            System.out.println(character.getName() + " has " + character.getCurHealth() + " health after the attack from " + this.getName());
+            if (character.getCurHealth() < 0) {
+                character.setAlive(false);
+                System.out.println(character.getName() + " has died.");
+            }
+        } else {
+            System.out.println(character.getName() + " is already dead.");
+        }
     }
 
     public void setName(String name) {
@@ -95,29 +79,6 @@ public class Character {
         }
         this.name = name;
     }
-
-//    public void healingAndHealth(Character character) {
-//        int healing = (int) (character.getMaxHealth() * 0.3);
-//        while (character.alive) {
-//            int rand = rnd(this.getMinDamage(), this.getMaxHealth());
-//            character.setCurHealth(character.getCurHealth() - rand);
-//            System.out.println(character.name + "have" + character.getCurHealth() + " health after attack" + this.name);
-//            if (character.getCurHealth() <= (1 - healing)) {
-//                character.setCurHealth(character.getCurHealth() + healing);
-//                System.out.println(character.name + "have" + character.getCurHealth() + " health after healing");
-//                character.liveAmount--;
-//                System.out.println(character.name + "have" + character.liveAmount + "healing");
-//                if (liveAmount == 0) {
-//                    if (character.getCurHealth() == 0) {
-//                        System.out.println(character.name + "is died");
-//                        character.alive = false;
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
-
 
     public int getMaxHealth() {
         return maxHealth;
@@ -156,6 +117,7 @@ public class Character {
         }
         this.attack = attack;
     }
+
 
     public void setCurHealth(int health) {
         if (this.getCurHealth() < 0) {
