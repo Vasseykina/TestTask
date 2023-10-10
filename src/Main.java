@@ -3,21 +3,19 @@ import Model.Player;
 
 public class Main {
     public static void main(String[] args) {
-        Monster monster = new Monster("Boo",12,6,30,5);
-        Player player = new Player("player",18,3,40,6);
+        Monster monster = new Monster("Boo",12,6,100,10, 20);
+        Player player = new Player("player",18,3,100,15,25);
 
 
         //int playerAttack = player.calculateSuccess(monster);
         //monster.calculateSuccess(player);
 
-        int i = 8 ;
-        while(i>0) {
+        while(player.isAlive() && monster.isAlive()) {
+            player.attack(monster);
             monster.attack(player);
-            player.healingHealth();
-            i--;
+            if(player.isAlive() && player.getCurHealth() <= player.getMaxHealth()*0.7) {
+                player.healingHealth();
+            }
         }
-        monster.attack(player);
-
-
     }
 }

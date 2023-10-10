@@ -6,19 +6,21 @@ public class Character {
     private int attack;// от 1 до 30
     private int protection;// от 1 до 30
     private int maxHealth;
-    private int Health;// до какого-то  N
+    private int health;// до какого-то  N
     //private int damage; // урон, что получил от M(1) до  N , что является здоровьем
     private int minDamage; // M
+    private int maxDamage; // M
     private boolean alive;
     private String name;
 
-    public Character(String name, int attack, int protection, int maxHealth, int minDamage) {
+    public Character(String name, int attack, int protection, int maxHealth, int minDamage, int maxDamage) {
         setName(name);
         setAttack(attack);
         setProtection(protection);
         setMaxHealth(maxHealth);
         setCurHealth(maxHealth);
         setMinDamage(minDamage);
+        setMaxDamage(maxDamage);
         this.alive = true;
     }
 
@@ -26,12 +28,8 @@ public class Character {
         return alive;
     }
 
-    public void setAlive(boolean alive) {
-        if (alive || !alive) {
-            this.alive = alive;
-        } else {
-            throw new IllegalArgumentException("Invalid value for 'alive'. Use only true or false.");
-        }
+    protected void setAlive(boolean alive) {
+        this.alive = alive;
     }
 
     public static int rnd(int min, int max) { //рандом в диапазоне
@@ -39,40 +37,39 @@ public class Character {
         return (int) (Math.random() * ++max) + min;
     }
 
-    public int calculateSuccess(Character character) { //количество атак
-        int modifier = this.getAttack() - character.getProtection() + 1; //количество кубиков
+    public void attack(Character character) {
+        System.out.println(this.getName() + " attack " + character.getName());
+        int modifier = this.getAttack() - character.getProtection() + 1;
         if (modifier <= 0) {
             modifier = 1;
         }
-        System.out.println(this.getName() + " have " + modifier + " modifier");
-        int countAttack = 0;
+        System.out.println("Modifier of attack " + modifier);
+        boolean isAttack = false;
         System.out.println("The value of the dice:");
         for (int i = 0; i < modifier; i++) {
             int rand = rnd(1, 6);
-            System.out.println(" dice" + i + " : " + rand);
+            System.out.println(" dice " + i + " : " + rand);
             if (rand >= 5) {
-                countAttack += 1;
+                isAttack = true;
+                break;
             }
         }
-        System.out.println(this.getName() + " have " + countAttack + " countAttack");
-        return countAttack;
-    }
-
-    public void attack(Character character) {
-        if (character.isAlive()==true) {
-            int damage = rnd(this.getMinDamage(), character.getCurHealth());
-            character.setCurHealth(character.getCurHealth() - damage);
-            System.out.println(character.getName() + " has " + character.getCurHealth() + " health after the attack from " + this.getName());
-            if (character.getCurHealth() < 0) {
-                character.setAlive(false);
-                System.out.println(character.getName() + " has died.");
+        if (character.isAlive()) {
+            if(isAttack) {
+                int damage = rnd(this.getMinDamage(), this.getMaxDamage());
+                character.setCurHealth(character.getCurHealth() - damage);
+                System.out.println(character.getName() + " has " + character.getCurHealth() + " health after the attack from " + this.getName());
+                if (character.getCurHealth() <= 0) {
+                    character.setAlive(false);
+                    System.out.println(character.getName() + " has died.");
+                }
             }
         } else {
             System.out.println(character.getName() + " is already dead.");
         }
     }
 
-    public void setName(String name) {
+    protected void setName(String name) {
         String regex = "^[a-zA-Z]+$";
         if (!Pattern.matches(regex, name)) {
             throw new IllegalArgumentException("Invalid name. Only letters are allowed.");
@@ -93,25 +90,29 @@ public class Character {
     }
 
     public int getCurHealth() {
-        return Health;
+        return health;
     }
 
     public int getMinDamage() {
         return minDamage;
     }
 
+    public int getMaxDamage() {
+        return maxDamage;
+    }
+
     public String getName() {
         return name;
     }
 
-    public void setProtection(int protection) {
+    protected void setProtection(int protection) {
         if (protection <= 0 || protection > 30) {
             throw new IllegalArgumentException("Wrong input: health cannot be negative or more 30.");
         }
         this.protection = protection;
     }
 
-    public void setAttack(int attack) {
+    protected void setAttack(int attack) {
         if (attack <= 0 || attack > 30) {
             throw new IllegalArgumentException("Wrong input: health cannot be negative or more 30.");
         }
@@ -119,28 +120,35 @@ public class Character {
     }
 
 
-    public void setCurHealth(int health) {
-        if (this.getCurHealth() < 0) {
-            this.Health = 0;
-        } else if (this.getCurHealth() > this.getMaxHealth()) {
-            this.Health = this.getMaxHealth();
+    protected void setCurHealth(int health) {
+        if (health < 0) {
+            this.health = 0;
+        } else if (health > this.getMaxHealth()) {
+            this.health = this.getMaxHealth();
         } else {
-            this.Health = health;
+            this.health = health;
         }
     }
 
-    public void setMaxHealth(int Health) {
-        if (this.Health < 0) {
+    protected void setMaxHealth(int health) {
+        if (health < 0) {
             throw new IllegalArgumentException("Wrong input: health cannot be negative.");
         }
-        this.maxHealth = Health;
+        this.maxHealth = health;
     }
 
-    public void setMinDamage(int minDamage) {
-        if (this.minDamage < 0) {
-            throw new IllegalArgumentException("Wrong input: health cannot be negative.");
+    protected void setMinDamage(int minDamage) {
+        if (minDamage < 0) {
+            throw new IllegalArgumentException("Wrong input: damage cannot be negative.");
         }
         this.minDamage = minDamage;
+    }
+
+    protected void setMaxDamage(int maxDamage) {
+        if (maxDamage < 0) {
+            throw new IllegalArgumentException("Wrong input: damage cannot be negative.");
+        }
+        this.maxDamage = maxDamage;
     }
 
 }
